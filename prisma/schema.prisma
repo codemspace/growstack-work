@@ -1,0 +1,36 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model UserInput {
+  id           Int            @id @default(autoincrement())
+  keywords     String
+  url          String?
+  createdAt    DateTime        @default(now())
+  workflowTasks WorkflowTask[] 
+}
+
+model WorkflowTask {
+  id           Int           @id @default(autoincrement())
+  taskName     String
+  status       String         @default("pending")
+  result       String?
+  createdAt    DateTime       @default(now())
+  userInputId  Int
+  UserInput    UserInput      @relation(fields: [userInputId], references: [id])
+  contentDrafts ContentDraft[]
+}
+
+model ContentDraft {
+  id            Int           @id @default(autoincrement())
+  content       String
+  platform      String
+  createdAt     DateTime      @default(now())
+  workflowTaskId Int
+  WorkflowTask  WorkflowTask  @relation(fields: [workflowTaskId], references: [id])
+}
